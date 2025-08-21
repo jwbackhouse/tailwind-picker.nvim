@@ -1,8 +1,12 @@
 local M = {}
 
 local function node_helper_path()
-  local base = vim.fn.stdpath('config')
-  return table.concat({ base, 'lua', 'tailwind_picker', 'node', 'index.js' }, package.config:sub(1, 1))
+  -- Resolve relative to this module's directory, so it works when installed as a plugin
+  local info = debug.getinfo(1, 'S')
+  local src = info and info.source or ''
+  src = src:gsub('^@', '')
+  local dir = vim.fs.dirname(src)
+  return table.concat({ dir, 'node', 'index.js' }, package.config:sub(1, 1))
 end
 
 function M.build_index(root, config_path, cache_dir, cb)
