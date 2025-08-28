@@ -141,6 +141,32 @@ end
 
 function M.setup(opts)
   opts = opts or {}
+  
+  -- Validate opts structure
+  if type(opts) ~= 'table' then
+    vim.notify('tailwind-picker: opts must be a table', vim.log.levels.WARN)
+    opts = {}
+  end
+  
+  -- Validate keys configuration
+  if opts.keys ~= nil then
+    if type(opts.keys) ~= 'table' then
+      vim.notify('tailwind-picker: opts.keys must be a table', vim.log.levels.WARN)
+      opts.keys = nil
+    elseif opts.keys.open ~= nil and type(opts.keys.open) ~= 'string' then
+      vim.notify('tailwind-picker: opts.keys.open must be a string', vim.log.levels.WARN)
+      opts.keys.open = nil
+    end
+  end
+  
+  -- Validate scan_depth
+  if opts.scan_depth ~= nil then
+    if type(opts.scan_depth) ~= 'number' or opts.scan_depth < 1 or opts.scan_depth > 10 then
+      vim.notify('tailwind-picker: opts.scan_depth must be a number between 1 and 10', vim.log.levels.WARN)
+      opts.scan_depth = nil
+    end
+  end
+  
   local open_key = opts.keys and opts.keys.open or '<leader>ft'
   if open_key and open_key ~= '' then
     vim.keymap.set('n', open_key, function()
