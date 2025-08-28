@@ -3,7 +3,7 @@ local M = {}
 local uv = vim.uv or vim.loop
 
 local function join_paths(...)
-  return table.concat({ ... }, package.config:sub(1, 1))
+  return vim.fs.joinpath(...)
 end
 
 local function path_exists(path)
@@ -22,17 +22,17 @@ local function read_file(path)
 end
 
 local function get_cache_dir(root)
-  local cache_root = join_paths(vim.fn.stdpath('cache'), 'tailwind-picker')
+  local cache_root = vim.fs.joinpath(vim.fn.stdpath('cache'), 'tailwind-picker')
   vim.fn.mkdir(cache_root, 'p')
   local hash = vim.fn.sha256(root)
-  local dir = join_paths(cache_root, hash)
+  local dir = vim.fs.joinpath(cache_root, hash)
   vim.fn.mkdir(dir, 'p')
   return dir
 end
 
 local function is_cache_stale(config_path, cache_dir)
-  local class_list = join_paths(cache_dir, 'classes.json')
-  local map_file = join_paths(cache_dir, 'filename-map.json')
+  local class_list = vim.fs.joinpath(cache_dir, 'classes.json')
+  local map_file = vim.fs.joinpath(cache_dir, 'filename-map.json')
   if not (path_exists(class_list) and path_exists(map_file)) then
     return true
   end
@@ -45,8 +45,8 @@ local function is_cache_stale(config_path, cache_dir)
 end
 
 local function open_picker_with_cache(cache_dir)
-  local classes_path = join_paths(cache_dir, 'classes.json')
-  local map_path = join_paths(cache_dir, 'filename-map.json')
+  local classes_path = vim.fs.joinpath(cache_dir, 'classes.json')
+  local map_path = vim.fs.joinpath(cache_dir, 'filename-map.json')
   local ok1, classes_json = pcall(read_file, classes_path)
   local ok2, map_json = pcall(read_file, map_path)
   if not (ok1 and ok2) then
@@ -59,7 +59,7 @@ local function open_picker_with_cache(cache_dir)
   local function finder()
     local items = {}
     for key, klass in pairs(fname_to_class) do
-      local file = join_paths(cache_dir, key .. '.css')
+      local file = vim.fs.joinpath(cache_dir, key .. '.css')
       if path_exists(file) then
         local css = ''
         local ok_css, content = pcall(read_file, file)

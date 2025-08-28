@@ -6,7 +6,7 @@ local function node_helper_path()
   local src = info and info.source or ''
   src = src:gsub('^@', '')
   local dir = vim.fs.dirname(src)
-  return table.concat({ dir, 'node', 'index.js' }, package.config:sub(1, 1))
+  return vim.fs.joinpath(dir, 'node', 'index.js')
 end
 
 function M.build_index(root, config_path, cache_dir, cb)

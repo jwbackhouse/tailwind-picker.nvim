@@ -41,7 +41,7 @@ local function workspace_scan_configs(cwd, max_depth)
       if name == '.' or name == '..' then
         goto continue
       end
-      local full = dir .. package.config:sub(1, 1) .. name
+      local full = vim.fs.joinpath(dir, name)
       if t == 'file' then
         if name:match '^tailwind%.config%.[cmjt]s$' then
           results[#results + 1] = full
