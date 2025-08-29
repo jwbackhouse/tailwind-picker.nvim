@@ -69,7 +69,27 @@ local function open_picker_with_cache(cache_dir)
             css = css:sub(1, 300)
           end
         end
-        table.insert(items, { text = klass .. ' ' .. css, class = klass, file = file })
+        -- Create separate searchable entries: one for classname, one for CSS content
+        -- This allows independent fuzzy matching within each field
+        local class_item = { 
+          text = klass, 
+          class = klass, 
+          file = file, 
+          css = css
+        }
+        
+        local css_trimmed = css and css:gsub("^%s*(.-)%s*$", "%1") or ''
+        if css_trimmed ~= '' then
+          local css_item = {
+            text = css_trimmed,
+            class = klass,
+            file = file,
+            css = css
+          }
+          table.insert(items, css_item)
+        end
+        
+        table.insert(items, class_item)
       end
     end
     table.sort(items, function(a, b)
@@ -84,7 +104,7 @@ local function open_picker_with_cache(cache_dir)
     finder = finder,
     preview = 'file',
     format = function(item)
-      return { { item.class or item.text } }
+      return { { item.class } }
     end,
     actions = {
       confirm = function(picker)
